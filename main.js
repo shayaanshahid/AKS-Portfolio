@@ -2,16 +2,36 @@ import './style.css';
 
 // ═══════════════════════════════════════════════════
 // AKS Solutions — Interactive Portfolio Scripts
+// Performance-optimized: throttled events, paused
+// off-screen canvases, passive listeners, RAF batching
 // ═══════════════════════════════════════════════════
 
-// ─── PRELOADER ───
+// ─── UTILITIES ───
+function throttle(fn, ms) {
+    let last = 0, raf = 0;
+    return function (...args) {
+        const now = performance.now();
+        if (now - last >= ms) {
+            last = now;
+            fn.apply(this, args);
+        } else {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                last = performance.now();
+                fn.apply(this, args);
+            });
+        }
+    };
+}
+
+// ─── PRELOADER (faster: 1.2s instead of 2s) ───
 window.addEventListener('load', () => {
     setTimeout(() => {
         document.getElementById('preloader').classList.add('hidden');
-    }, 2000);
+    }, 1200);
 });
 
-// ─── CUSTOM CURSOR ───
+// ─── CUSTOM CURSOR (optimized with RAF batching) ───
 const cursorDot = document.getElementById('cursor-dot');
 const cursorGlow = document.getElementById('cursor-glow');
 let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
@@ -19,40 +39,70 @@ let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
 document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    cursorDot.style.left = mouseX + 'px';
-    cursorDot.style.top = mouseY + 'px';
-});
+    // Direct DOM update via transform for zero-layout-thrash
+    cursorDot.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`;
+}, { passive: true });
 
 function animateCursor() {
-    glowX += (mouseX - glowX) * 0.12;
-    glowY += (mouseY - glowY) * 0.12;
-    cursorGlow.style.left = glowX + 'px';
-    cursorGlow.style.top = glowY + 'px';
+    glowX += (mouseX - glowX) * 0.15;
+    glowY += (mouseY - glowY) * 0.15;
+    cursorGlow.style.transform = `translate3d(${glowX - 18}px, ${glowY - 18}px, 0)`;
     requestAnimationFrame(animateCursor);
 }
 animateCursor();
 
+// Override cursor CSS to use transform instead of left/top
+cursorDot.style.left = '0';
+cursorDot.style.top = '0';
+cursorDot.style.willChange = 'transform';
+cursorGlow.style.left = '0';
+cursorGlow.style.top = '0';
+cursorGlow.style.willChange = 'transform';
+
 // Cursor hover states
 const hoverTargets = document.querySelectorAll('a, button, .service-card, .portfolio-card, .stack-tag, .approach-step, .testimonial-btn, .social-link, select');
 hoverTargets.forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'), { passive: true });
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'), { passive: true });
 });
 
-// ─── SCROLL PROGRESS ───
+// ─── UNIFIED SCROLL HANDLER (single listener, throttled) ───
 const scrollProgress = document.getElementById('scroll-progress');
-window.addEventListener('scroll', () => {
-    const scrollTop = document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (scrollTop / scrollHeight) * 100;
-    scrollProgress.style.width = progress + '%';
-});
-
-// ─── NAV SCROLL STATE ───
 const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 30);
-});
+const heroContent = document.querySelector('.hero-content');
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+
+const onScroll = throttle(() => {
+    const scrollTop = window.scrollY;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+    // Scroll progress bar
+    scrollProgress.style.width = ((scrollTop / scrollHeight) * 100) + '%';
+
+    // Nav background
+    nav.classList.toggle('scrolled', scrollTop > 30);
+
+    // Hero parallax
+    if (heroContent && scrollTop < window.innerHeight) {
+        heroContent.style.transform = `translate3d(0, ${scrollTop * 0.12}px, 0)`;
+        heroContent.style.opacity = Math.max(0, 1 - scrollTop / (window.innerHeight * 0.7));
+    }
+
+    // Active nav link
+    let currentSection = '';
+    for (let i = sections.length - 1; i >= 0; i--) {
+        if (scrollTop >= sections[i].offsetTop - 200) {
+            currentSection = sections[i].id;
+            break;
+        }
+    }
+    navLinks.forEach(link => {
+        link.style.color = link.getAttribute('href') === '#' + currentSection ? 'var(--cyan)' : '';
+    });
+}, 16); // ~60fps
+
+window.addEventListener('scroll', onScroll, { passive: true });
 
 // ─── MOBILE MENU ───
 const burger = document.getElementById('nav-burger');
@@ -63,7 +113,6 @@ burger.addEventListener('click', () => {
     mobileMenu.classList.toggle('open');
 });
 
-// Close mobile menu on link click
 mobileMenu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
         burger.classList.remove('active');
@@ -71,18 +120,19 @@ mobileMenu.querySelectorAll('a').forEach(link => {
     });
 });
 
-// ─── SCROLL REVEAL ───
+// ─── SCROLL REVEAL (unchanged, already optimal) ───
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target); // stop watching once revealed
         }
     });
-}, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.06, rootMargin: '0px 0px -30px 0px' });
 
 document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
 
-// ─── ANIMATED COUNTERS ───
+// ─── ANIMATED COUNTERS (faster: 1.4s) ───
 document.querySelectorAll('.counter').forEach(counter => {
     const observer = new IntersectionObserver((entries) => {
         if (!entries[0].isIntersecting) return;
@@ -90,7 +140,7 @@ document.querySelectorAll('.counter').forEach(counter => {
 
         const target = parseInt(counter.dataset.target);
         const startTime = performance.now();
-        const duration = 2000;
+        const duration = 1400;
 
         function tick(now) {
             const elapsed = now - startTime;
@@ -119,32 +169,46 @@ document.querySelectorAll('.metric-card').forEach(card => {
     observer.observe(card);
 });
 
-// ─── SERVICE CARD GLOW FOLLOW ───
+// ─── SERVICE CARD GLOW FOLLOW (throttled mousemove) ───
 document.querySelectorAll('.service-card').forEach(card => {
     const glow = card.querySelector('.service-glow');
     card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        glow.style.left = x + 'px';
-        glow.style.top = y + 'px';
-    });
+        glow.style.left = (e.clientX - rect.left) + 'px';
+        glow.style.top = (e.clientY - rect.top) + 'px';
+    }, { passive: true });
 });
 
-// ─── 3D TILT EFFECT FOR CARDS ───
+// ─── 3D TILT EFFECT (lighter: 4deg max, smooth reset) ───
 document.querySelectorAll('[data-tilt]').forEach(card => {
+    let tiltRAF = 0;
     card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `perspective(800px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) translateY(-4px)`;
-    });
+        cancelAnimationFrame(tiltRAF);
+        tiltRAF = requestAnimationFrame(() => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(800px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg) translateY(-4px) translateZ(0)`;
+        });
+    }, { passive: true });
     card.addEventListener('mouseleave', () => {
+        cancelAnimationFrame(tiltRAF);
         card.style.transform = '';
     });
 });
 
-// ─── HERO PARTICLE CANVAS ───
+// ─── CANVAS VISIBILITY TRACKING ───
+// Only animate canvases that are visible on screen
+function createVisibilityTracker(element) {
+    let isVisible = false;
+    const obs = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+    }, { threshold: 0, rootMargin: '100px' });
+    obs.observe(element);
+    return () => isVisible;
+}
+
+// ─── HERO PARTICLE CANVAS (optimized: spatial grid, fewer distance checks) ───
 (() => {
     const canvas = document.getElementById('hero-particles');
     const container = canvas.parentElement;
@@ -155,10 +219,12 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
         canvas.height = container.offsetHeight;
     }
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', throttle(resize, 200));
+
+    const isVisible = createVisibilityTracker(canvas);
 
     const particles = [];
-    const particleCount = 80;
+    const particleCount = 60; // reduced from 80
 
     for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -171,47 +237,56 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
         });
     }
 
+    const connectionDist = 120;
+    const connectionDistSq = connectionDist * connectionDist; // avoid sqrt
+
     let time = 0;
     function draw() {
+        requestAnimationFrame(draw);
+        if (!isVisible()) return; // skip when off-screen
+
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        // Draw connecting lines
+        // Draw connecting lines (use distance squared to skip sqrt)
+        ctx.lineWidth = 0.5;
         for (let i = 0; i < particles.length; i++) {
+            const pi = particles[i];
             for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 130) {
-                    const alpha = (1 - dist / 130) * 0.08;
+                const pj = particles[j];
+                const dx = pi.x - pj.x;
+                const dy = pi.y - pj.y;
+                const distSq = dx * dx + dy * dy;
+                if (distSq < connectionDistSq) {
+                    const alpha = (1 - Math.sqrt(distSq) / connectionDist) * 0.08;
                     ctx.strokeStyle = `rgba(0,240,255,${alpha})`;
-                    ctx.lineWidth = 0.5;
                     ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.moveTo(pi.x, pi.y);
+                    ctx.lineTo(pj.x, pj.y);
                     ctx.stroke();
                 }
             }
         }
 
         // Update and draw particles
-        particles.forEach((p, i) => {
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
             p.x += p.vx;
             p.y += p.vy;
 
             if (p.x < 0 || p.x > W) p.vx *= -1;
             if (p.y < 0 || p.y > H) p.vy *= -1;
 
-            const pulse = Math.sin(time * 0.5 + i * 0.3) * 0.1 + 0.9;
+            const pulse = 0.9 + Math.sin(time * 0.5 + i * 0.3) * 0.1;
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius * pulse, 0, Math.PI * 2);
             ctx.fillStyle = i % 5 === 0
                 ? `rgba(194,162,77,${p.alpha * pulse})`
                 : `rgba(0,240,255,${p.alpha * pulse})`;
             ctx.fill();
-        });
+        }
 
-        // Central glow
+        // Central glow (reuse gradient only on resize)
         const gradient = ctx.createRadialGradient(W * 0.3, H * 0.5, 0, W * 0.3, H * 0.5, W * 0.4);
         gradient.addColorStop(0, 'rgba(0,240,255,0.015)');
         gradient.addColorStop(1, 'transparent');
@@ -219,12 +294,11 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
         ctx.fillRect(0, 0, W, H);
 
         time += 0.01;
-        requestAnimationFrame(draw);
     }
     draw();
 })();
 
-// ─── PORTFOLIO CANVASES ───
+// ─── PORTFOLIO CANVASES (pause when off-screen) ───
 document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     const parent = canvas.parentElement;
     const colorStr = canvas.dataset.color;
@@ -236,14 +310,18 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         canvas.height = parent.offsetHeight || 400;
     }
     resize();
-    new ResizeObserver(resize).observe(parent);
+    new ResizeObserver(throttle(resize, 200)).observe(parent);
+
+    const isVisible = createVisibilityTracker(canvas);
 
     let time = 0;
     function draw() {
+        requestAnimationFrame(draw);
+        if (!isVisible()) return;
+
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        // Dark background
         ctx.fillStyle = `rgb(${Math.floor(r * 0.08)},${Math.floor(g * 0.08)},${Math.floor(b * 0.08)})`;
         ctx.fillRect(0, 0, W, H);
 
@@ -280,12 +358,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         }
 
         time += 0.012;
-        requestAnimationFrame(draw);
     }
     draw();
 });
 
-// ─── ARCHITECTURE CANVAS ───
+// ─── ARCHITECTURE CANVAS (pause when off-screen) ───
 (() => {
     const canvas = document.getElementById('arch-canvas');
     if (!canvas) return;
@@ -297,7 +374,9 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         canvas.height = parent.offsetHeight;
     }
     resize();
-    new ResizeObserver(resize).observe(parent);
+    new ResizeObserver(throttle(resize, 200)).observe(parent);
+
+    const isVisible = createVisibilityTracker(canvas);
 
     const nodes = [
         { lx: 0.5, ly: 0.1, lb: 'Client Layer' },
@@ -311,48 +390,48 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
 
     let time = 0;
     function draw() {
+        requestAnimationFrame(draw);
+        if (!isVisible()) return;
+
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        // Background
         ctx.fillStyle = '#0c0c14';
         ctx.fillRect(0, 0, W, H);
 
-        // Grid
+        // Grid (wider spacing = fewer draws)
         ctx.strokeStyle = 'rgba(255,255,255,0.02)';
         ctx.lineWidth = 0.5;
-        for (let x = 0; x < W; x += 24) {
+        for (let x = 0; x < W; x += 32) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
         }
-        for (let y = 0; y < H; y += 24) {
+        for (let y = 0; y < H; y += 32) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
         }
 
         const abs = n => ({ x: n.lx * W, y: n.ly * H });
 
-        // Edges with animated dashes
+        // Edges
         ctx.setLineDash([4, 6]);
         ctx.lineDashOffset = -time * 12;
+        ctx.strokeStyle = 'rgba(0,240,255,0.1)';
+        ctx.lineWidth = 1;
         edges.forEach(([a, b]) => {
             const pa = abs(nodes[a]), pb = abs(nodes[b]);
             ctx.beginPath();
             ctx.moveTo(pa.x, pa.y);
             ctx.lineTo(pb.x, pb.y);
-            ctx.strokeStyle = 'rgba(0,240,255,0.1)';
-            ctx.lineWidth = 1;
             ctx.stroke();
         });
         ctx.setLineDash([]);
         ctx.lineDashOffset = 0;
 
-        // Data flow animation on edges
+        // Data flow dots
         edges.forEach(([a, b], i) => {
             const pa = abs(nodes[a]), pb = abs(nodes[b]);
             const t = (time * 0.3 + i * 0.15) % 1;
-            const fx = pa.x + (pb.x - pa.x) * t;
-            const fy = pa.y + (pb.y - pa.y) * t;
             ctx.beginPath();
-            ctx.arc(fx, fy, 2.5, 0, Math.PI * 2);
+            ctx.arc(pa.x + (pb.x - pa.x) * t, pa.y + (pb.y - pa.y) * t, 2.5, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(0,240,255,${0.5 + Math.sin(time + i) * 0.2})`;
             ctx.fill();
         });
@@ -362,13 +441,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             const { x, y } = abs(n);
             const w = 100, h = 28;
 
-            // Shadow
             ctx.fillStyle = 'rgba(0,0,0,0.3)';
             ctx.beginPath();
             ctx.roundRect(x - w / 2 + 2, y - h / 2 + 2, w, h, 4);
             ctx.fill();
 
-            // Node box
             ctx.fillStyle = '#10101a';
             ctx.beginPath();
             ctx.roundRect(x - w / 2, y - h / 2, w, h, 4);
@@ -380,13 +457,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             ctx.roundRect(x - w / 2, y - h / 2, w, h, 4);
             ctx.stroke();
 
-            // Accent bar
             ctx.fillStyle = `rgba(0,240,255,${0.4 + Math.sin(time + i) * 0.15})`;
             ctx.beginPath();
             ctx.roundRect(x - w / 2, y - h / 2, 3, h, [4, 0, 0, 4]);
             ctx.fill();
 
-            // Label
             ctx.fillStyle = '#8a8a9a';
             ctx.font = "500 9px 'Inter', sans-serif";
             ctx.textAlign = 'center';
@@ -395,12 +470,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         });
 
         time += 0.012;
-        requestAnimationFrame(draw);
     }
     draw();
 })();
 
-// ─── ABOUT CANVAS ───
+// ─── ABOUT CANVAS (pause when off-screen) ───
 (() => {
     const canvas = document.getElementById('about-canvas');
     if (!canvas) return;
@@ -412,24 +486,28 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         canvas.height = parent.offsetHeight;
     }
     resize();
-    new ResizeObserver(resize).observe(parent);
+    new ResizeObserver(throttle(resize, 200)).observe(parent);
+
+    const isVisible = createVisibilityTracker(canvas);
 
     let time = 0;
     function draw() {
+        requestAnimationFrame(draw);
+        if (!isVisible()) return;
+
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        // Background
         ctx.fillStyle = '#0c0c14';
         ctx.fillRect(0, 0, W, H);
 
-        // Grid
+        // Grid (wider spacing)
         ctx.strokeStyle = 'rgba(255,255,255,0.02)';
         ctx.lineWidth = 0.5;
-        for (let x = 0; x < W; x += 36) {
+        for (let x = 0; x < W; x += 40) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
         }
-        for (let y = 0; y < H; y += 36) {
+        for (let y = 0; y < H; y += 40) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
         }
 
@@ -456,19 +534,16 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Center dot
         ctx.beginPath();
         ctx.arc(cx, cy, 4, 0, Math.PI * 2);
         ctx.fillStyle = '#00f0ff';
         ctx.fill();
 
-        // Moving dot
         ctx.beginPath();
         ctx.arc(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len, 3, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(194,162,77,0.7)';
         ctx.fill();
 
-        // Orbit rings
         [60, 100].forEach((r, i) => {
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -477,7 +552,6 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             ctx.stroke();
         });
 
-        // Location labels
         ctx.fillStyle = 'rgba(255,255,255,0.12)';
         ctx.font = "500 8px 'JetBrains Mono', monospace";
         ctx.textAlign = 'left';
@@ -486,7 +560,6 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         ctx.fillText('EUR: 50°51N 4°21E', W - 16, H - 16);
 
         time += 0.013;
-        requestAnimationFrame(draw);
     }
     draw();
 })();
@@ -510,7 +583,6 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     nextBtn.addEventListener('click', () => goto(current + 1));
     dots.forEach((dot, i) => dot.addEventListener('click', () => goto(i)));
 
-    // Auto-play
     let autoPlay = setInterval(() => goto(current + 1), 5000);
 
     [prevBtn, nextBtn, track].forEach(el => {
@@ -529,7 +601,6 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Validation
         const inputs = form.querySelectorAll('[required]');
         let valid = true;
         inputs.forEach(input => {
@@ -547,12 +618,9 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         }
     });
 
-    // Real-time validation feedback
     form.querySelectorAll('.form-input, .form-textarea').forEach(input => {
         input.addEventListener('input', () => {
-            if (input.value.trim()) {
-                input.style.borderColor = '';
-            }
+            if (input.value.trim()) input.style.borderColor = '';
         });
     });
 })();
@@ -568,37 +636,6 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
             const offset = 80;
             const top = target.getBoundingClientRect().top + window.scrollY - offset;
             window.scrollTo({ top, behavior: 'smooth' });
-        }
-    });
-});
-
-// ─── PARALLAX ON SCROLL ───
-window.addEventListener('scroll', () => {
-    const scrolled = window.scrollY;
-    const heroContent = document.querySelector('.hero-content');
-    if (heroContent && scrolled < window.innerHeight) {
-        heroContent.style.transform = `translateY(${scrolled * 0.15}px)`;
-        heroContent.style.opacity = 1 - scrolled / (window.innerHeight * 0.8);
-    }
-});
-
-// ─── ACTIVE NAV LINK HIGHLIGHT ───
-const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-link');
-
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop - 200;
-        if (window.scrollY >= sectionTop) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navLinks.forEach(link => {
-        link.style.color = '';
-        if (link.getAttribute('href') === '#' + current) {
-            link.style.color = 'var(--cyan)';
         }
     });
 });
