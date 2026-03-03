@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AKS Solutions — Engineering Digital Infrastructure</title>
+  <meta name="description" content="AKS Solutions is a boutique software engineering firm delivering enterprise-grade digital infrastructure for European SMEs, logistics companies, and SaaS startups.">
+  <meta name="keywords" content="software engineering, SaaS development, cloud infrastructure, API integration, DevOps, enterprise web applications">
+  <meta property="og:title" content="AKS Solutions — Engineering Digital Infrastructure">
+  <meta property="og:description" content="Secure, scalable, structured systems built for operational longevity and European compliance.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Cursor -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-glow"></div>
+
+  <!-- Scroll Progress -->
+  <div id="scroll-progress"></div>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="preloader-inner">
+      <svg class="preloader-logo" width="60" height="60" viewBox="0 0 32 32" fill="none">
+        <polyline points="4,24 8.5,9 13,24" stroke="#00f0ff" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+        <line x1="5.8" y1="18.5" x2="11.2" y2="18.5" stroke="#00f0ff" stroke-width="1.5"/>
+        <line x1="14.5" y1="9" x2="14.5" y2="24" stroke="#ffffff" stroke-width="1.5"/>
+        <line x1="14.5" y1="16.5" x2="20" y2="9" stroke="#ffffff" stroke-width="1.5"/>
+        <line x1="14.5" y1="16.5" x2="20" y2="24" stroke="#ffffff" stroke-width="1.5"/>
+        <path d="M22 13.5Q22 9.5 25 9.5Q28 9.5 28 12.5Q28 16.5 23.5 16.5Q21.5 16.5 21.5 20Q21.5 24 25 24Q28 24 28 21.5" stroke="#C2A24D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="preloader-bar"><div class="preloader-fill"></div></div>
+      <span class="preloader-text">Initializing Systems</span>
+    </div>
+  </div>
+
+  <!-- ═══════════ NAV ═══════════ -->
+  <nav id="nav">
+    <a href="#" class="nav-brand" id="nav-brand">
+      <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+        <polyline points="4,24 8.5,9 13,24" stroke="#00f0ff" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+        <line x1="5.8" y1="18.5" x2="11.2" y2="18.5" stroke="#00f0ff" stroke-width="1.3"/>
+        <line x1="14.5" y1="9" x2="14.5" y2="24" stroke="#ffffff" stroke-width="1.3"/>
+        <line x1="14.5" y1="16.5" x2="20" y2="9" stroke="#ffffff" stroke-width="1.3"/>
+        <line x1="14.5" y1="16.5" x2="20" y2="24" stroke="#ffffff" stroke-width="1.3"/>
+        <path d="M22 13.5Q22 9.5 25 9.5Q28 9.5 28 12.5Q28 16.5 23.5 16.5Q21.5 16.5 21.5 20Q21.5 24 25 24Q28 24 28 21.5" stroke="#C2A24D" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-wordmark">AKS<span class="accent-dot">.</span></span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#services" class="nav-link">Services</a></li>
+      <li><a href="#work" class="nav-link">Work</a></li>
+      <li><a href="#approach" class="nav-link">Approach</a></li>
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#stack" class="nav-link">Technology</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta" id="nav-cta">
+      <span>Start a Project</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m-4-4 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <button class="nav-burger" id="nav-burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu">
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#approach">Approach</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#stack">Technology</a></li>
+      <li><a href="#contact" class="mobile-cta">Start a Project</a></li>
+    </ul>
+  </div>
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <section id="hero">
+    <canvas id="hero-particles"></canvas>
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow reveal-up">
+        <span class="status-dot"></span>
+        <span class="hero-label">Engineering Digital Infrastructure</span>
+      </div>
+      <h1 class="hero-h1">
+        <span class="hero-line reveal-up rd1">Secure.</span>
+        <span class="hero-line reveal-up rd2">Scalable.</span>
+        <span class="hero-line hero-bold reveal-up rd3">Structured <em>Systems.</em></span>
+      </h1>
+      <p class="hero-desc reveal-up rd4">We architect and deliver enterprise-grade software for European SMEs, logistics companies, and SaaS startups — built for operational longevity and compliance.</p>
+      <div class="hero-actions reveal-up rd5">
+        <a href="#services" class="btn-primary" id="btn-hero-services">
+          <span>Our Services</span>
+          <div class="btn-shimmer"></div>
+        </a>
+        <a href="#contact" class="btn-outline" id="btn-hero-contact">Start a Project</a>
+      </div>
+      <div class="hero-badges reveal-up rd6">
+        <span class="hero-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#00f0ff" stroke-width="1.5" fill="none"/></svg> GDPR-Compliant</span>
+        <span class="hero-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="#C2A24D" stroke-width="1.5" fill="none"/><polyline points="22 4 12 14.01 9 11.01" stroke="#C2A24D" stroke-width="1.5" fill="none"/></svg> Enterprise-Grade</span>
+        <span class="hero-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#00f0ff" stroke-width="1.5" fill="none"/><line x1="2" y1="12" x2="22" y2="12" stroke="#00f0ff" stroke-width="1.5"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="#00f0ff" stroke-width="1.5" fill="none"/></svg> Global Delivery</span>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <div class="scroll-line"><div class="scroll-dot"></div></div>
+      <span>Scroll</span>
+    </div>
+    <div class="hero-coordinates">
+      <span class="coord-text">50°51'N 4°21'E — Belgium & EU Market</span>
+    </div>
+  </section>
+
+  <!-- ═══════════ METRICS ═══════════ -->
+  <section id="metrics">
+    <div class="metric-card reveal-up">
+      <div class="metric-value"><span class="counter" data-target="8">0</span><sup>+</sup></div>
+      <div class="metric-label">Years in Operation</div>
+      <div class="metric-bar"><div class="metric-fill" style="--fill-width: 80%"></div></div>
+    </div>
+    <div class="metric-card reveal-up rd1">
+      <div class="metric-value"><span class="counter" data-target="50">0</span><sup>+</sup></div>
+      <div class="metric-label">Clients Across Europe</div>
+      <div class="metric-bar"><div class="metric-fill" style="--fill-width: 65%"></div></div>
+    </div>
+    <div class="metric-card reveal-up rd2">
+      <div class="metric-value"><span class="counter" data-target="150">0</span><sup>+</sup></div>
+      <div class="metric-label">Systems Delivered</div>
+      <div class="metric-bar"><div class="metric-fill" style="--fill-width: 90%"></div></div>
+    </div>
+    <div class="metric-card reveal-up rd3">
+      <div class="metric-value"><span class="counter" data-target="99">0</span><sup>%</sup></div>
+      <div class="metric-label">On-Time Delivery</div>
+      <div class="metric-bar"><div class="metric-fill" style="--fill-width: 99%"></div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════ TRUSTED BY ═══════════ -->
+  <section id="clients">
+    <div class="clients-label reveal-up">
+      <span class="section-tag">Trusted By</span>
+    </div>
+    <div class="clients-marquee">
+      <div class="marquee-inner">
+        <span class="client-name">Logistics EU</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">TechSME Belgium</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">IndustrialX</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">SaaS Group</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">EnterpriseCore</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">NovaTech BE</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">Logistics EU</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">TechSME Belgium</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">IndustrialX</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">SaaS Group</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">EnterpriseCore</span>
+        <span class="client-sep">◆</span>
+        <span class="client-name">NovaTech BE</span>
+        <span class="client-sep">◆</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ SERVICES ═══════════ -->
+  <section class="section" id="services">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Services</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">Engineering Partner,<br><em>Not Vendor.</em></h2>
+        <p class="section-desc">We embed with your team to architect, build, and operate digital systems tailored precisely to your operational requirements.</p>
+      </div>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal-up" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <span class="service-number">01</span>
+        <h3 class="service-title">Custom Software Development</h3>
+        <p class="service-body">Bespoke applications built from first principles — no templates, no off-the-shelf shortcuts. Designed around your exact business logic.</p>
+        <div class="service-glow"></div>
+      </div>
+      <div class="service-card reveal-up rd1" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/><path d="m23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" stroke-width="1.5"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <span class="service-number">02</span>
+        <h3 class="service-title">SaaS Architecture & Development</h3>
+        <p class="service-body">Multi-tenant SaaS platforms engineered for performance, security isolation, and subscription-based commercial models.</p>
+        <div class="service-glow"></div>
+      </div>
+      <div class="service-card reveal-up rd2" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="1.5"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <span class="service-number">03</span>
+        <h3 class="service-title">Enterprise Web Applications</h3>
+        <p class="service-body">Complex, data-intensive web systems for internal operations or external users — reliable, compliant, and built to last.</p>
+        <div class="service-glow"></div>
+      </div>
+      <div class="service-card reveal-up rd3" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="service-number">04</span>
+        <h3 class="service-title">API & Systems Integration</h3>
+        <p class="service-body">Connecting third-party tools, legacy infrastructure, and modern APIs into a coherent, well-documented technical layer.</p>
+        <div class="service-glow"></div>
+      </div>
+      <div class="service-card reveal-up rd4" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <span class="service-number">05</span>
+        <h3 class="service-title">Cloud Infrastructure & DevOps</h3>
+        <p class="service-body">Secure, automated deployment pipelines and cloud environments on AWS or Azure — built to scale without breaking.</p>
+        <div class="service-glow"></div>
+      </div>
+      <div class="service-card reveal-up rd5" data-tilt>
+        <div class="service-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <span class="service-number">06</span>
+        <h3 class="service-title">Technical Audits & Optimization</h3>
+        <p class="service-body">Structured review of existing systems — identifying performance bottlenecks, security vulnerabilities, and architectural debt.</p>
+        <div class="service-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ WORK / PORTFOLIO ═══════════ -->
+  <section class="section section-dark" id="work">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Selected Work</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">Projects That<br><em>Define Us.</em></h2>
+      </div>
+    </div>
+    <div class="portfolio-grid">
+      <div class="portfolio-card portfolio-wide reveal-up" id="project-logiflow">
+        <div class="portfolio-bg">
+          <canvas class="portfolio-canvas" data-color="0,240,255"></canvas>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-tag">Logistics · SaaS · API Integration</span>
+          <h3 class="portfolio-name">LogiFlow</h3>
+          <p class="portfolio-brief">End-to-end logistics management platform serving 200+ European freight companies with real-time tracking and automated dispatch.</p>
+        </div>
+        <span class="portfolio-static">LogiFlow — Logistics Management Platform</span>
+      </div>
+      <div class="portfolio-card reveal-up rd1" id="project-vaultpay">
+        <div class="portfolio-bg">
+          <canvas class="portfolio-canvas" data-color="194,162,77"></canvas>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-tag">Fintech · Cloud · GDPR</span>
+          <h3 class="portfolio-name">VaultPay</h3>
+          <p class="portfolio-brief">GDPR-compliant payment orchestration platform processing €2M+ monthly for Belgian SMEs.</p>
+        </div>
+        <span class="portfolio-static">VaultPay — Fintech Platform</span>
+      </div>
+      <div class="portfolio-card reveal-up rd2" id="project-industrialos">
+        <div class="portfolio-bg">
+          <canvas class="portfolio-canvas" data-color="100,200,130"></canvas>
+        </div>
+        <div class="portfolio-overlay"></div>
+        <div class="portfolio-content">
+          <span class="portfolio-tag">Industrial · Enterprise · IoT</span>
+          <h3 class="portfolio-name">IndustrialOS</h3>
+          <p class="portfolio-brief">Factory floor management system integrating IoT sensors with real-time dashboards for 12 manufacturing plants.</p>
+        </div>
+        <span class="portfolio-static">IndustrialOS — Factory Software</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CALLOUT ═══════════ -->
+  <section class="callout-section reveal-up">
+    <div class="callout-bg">
+      <div class="callout-particles"></div>
+    </div>
+    <div class="callout-content">
+      <p class="callout-text">We architect <em>secure, scalable</em> digital systems built<br><strong>for operational longevity and European compliance.</strong></p>
+      <a href="#contact" class="btn-primary callout-cta" id="btn-callout-cta">
+        <span>Start a Conversation</span>
+        <div class="btn-shimmer"></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════ APPROACH ═══════════ -->
+  <section class="section" id="approach">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Approach</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">How We Work.</h2>
+        <p class="section-desc">A structured methodology developed across 150+ delivered systems. Systematic, transparent, repeatable.</p>
+      </div>
+    </div>
+    <div class="approach-grid">
+      <div class="approach-steps">
+        <div class="approach-step reveal-up" data-step="1">
+          <div class="step-indicator">
+            <span class="step-number">01</span>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h3 class="step-title">Discovery & Scoping</h3>
+            <p class="step-body">We map business requirements, user flows, and technical constraints before writing a single line of code.</p>
+          </div>
+        </div>
+        <div class="approach-step reveal-up rd1" data-step="2">
+          <div class="step-indicator">
+            <span class="step-number">02</span>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h3 class="step-title">System Architecture</h3>
+            <p class="step-body">We design the complete technical blueprint — infrastructure topology, data models, API contracts, and security boundaries.</p>
+          </div>
+        </div>
+        <div class="approach-step reveal-up rd2" data-step="3">
+          <div class="step-indicator">
+            <span class="step-number">03</span>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h3 class="step-title">Iterative Engineering</h3>
+            <p class="step-body">Structured two-week sprints with live demos, continuous delivery, and full transparency throughout.</p>
+          </div>
+        </div>
+        <div class="approach-step reveal-up rd3" data-step="4">
+          <div class="step-indicator">
+            <span class="step-number">04</span>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <h3 class="step-title">Deployment & Handover</h3>
+            <p class="step-body">Rigorous QA, staged rollout, comprehensive documentation, and knowledge transfer to your team.</p>
+          </div>
+        </div>
+      </div>
+      <div class="approach-visual reveal-up rd2">
+        <canvas id="arch-canvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ TESTIMONIALS ═══════════ -->
+  <section class="section section-dark" id="testimonials">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Testimonials</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">What Our<br><em>Clients Say.</em></h2>
+      </div>
+    </div>
+    <div class="testimonials-carousel reveal-up rd2">
+      <div class="testimonial-track" id="testimonial-track">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote class="testimonial-quote">"AKS Solutions transformed our logistics operations. Their team delivered a flawless platform that handles 10,000+ daily shipments with zero downtime."</blockquote>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JV</div>
+            <div>
+              <div class="testimonial-name">Jan Verhoeven</div>
+              <div class="testimonial-role">CTO, Logistics EU</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote class="testimonial-quote">"A serious engineering firm — stable, competent, and long-term oriented. They built our entire SaaS platform from the ground up in just 14 weeks."</blockquote>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SD</div>
+            <div>
+              <div class="testimonial-name">Sophie De Clerck</div>
+              <div class="testimonial-role">Founder, TechSME Belgium</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <blockquote class="testimonial-quote">"Their understanding of GDPR compliance and European market requirements is exceptional. We couldn't have found a better technical partner."</blockquote>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MK</div>
+            <div>
+              <div class="testimonial-name">Marcus Klein</div>
+              <div class="testimonial-role">Director, EnterpriseCore GmbH</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-controls">
+        <button class="testimonial-btn" id="testimonial-prev" aria-label="Previous testimonial">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="testimonial-dots" id="testimonial-dots">
+          <span class="testimonial-dot active"></span>
+          <span class="testimonial-dot"></span>
+          <span class="testimonial-dot"></span>
+        </div>
+        <button class="testimonial-btn" id="testimonial-next" aria-label="Next testimonial">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ABOUT ═══════════ -->
+  <section class="section" id="about">
+    <div class="about-grid">
+      <div class="about-content reveal-up">
+        <span class="section-tag">About AKS Solutions</span>
+        <h2 class="section-title" style="margin-top: 16px;">Built on Precision.<br><em>Oriented Toward Longevity.</em></h2>
+        <p class="about-body">AKS Solutions is a boutique software engineering firm registered in Pakistan, delivering structured, secure digital infrastructure primarily for European clients — with a focus on Belgian and broader EU SMEs, logistics operators, and industrial businesses.</p>
+        <p class="about-body">We are not a generalist agency. We select engagements where our depth in systems architecture, backend engineering, and cloud infrastructure creates measurable, lasting value.</p>
+        <div class="about-quote">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" fill="rgba(0,240,255,0.15)"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" fill="rgba(0,240,255,0.15)"/></svg>
+          <p>"A serious engineering firm — stable, competent, and long-term oriented."</p>
+        </div>
+      </div>
+      <div class="about-visual reveal-up rd2">
+        <canvas id="about-canvas"></canvas>
+        <div class="about-stats">
+          <div class="about-stat">
+            <span class="about-stat-value">24h</span>
+            <span class="about-stat-label">Response Time</span>
+          </div>
+          <div class="about-stat">
+            <span class="about-stat-value">5</span>
+            <span class="about-stat-label">EU Markets</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ TECHNOLOGY ═══════════ -->
+  <section class="section section-dark" id="stack">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Technology</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">Selected<br><em>Technology Stack.</em></h2>
+        <p class="section-desc">Battle-tested technologies chosen for reliability, maintainability, and long-term operational integrity.</p>
+      </div>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-category reveal-up">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="#00f0ff" stroke-width="1.5"/><line x1="8" y1="21" x2="16" y2="21" stroke="#00f0ff" stroke-width="1.5"/><line x1="12" y1="17" x2="12" y2="21" stroke="#00f0ff" stroke-width="1.5"/></svg>
+          <span>Frontend</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">React</span>
+          <span class="stack-tag">Next.js</span>
+          <span class="stack-tag">TypeScript</span>
+          <span class="stack-tag">Vue.js</span>
+          <span class="stack-tag">Tailwind</span>
+        </div>
+      </div>
+      <div class="stack-category reveal-up rd1">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round"/><polyline points="8 6 2 12 8 18" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Backend</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">Node.js</span>
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">Go</span>
+          <span class="stack-tag">REST APIs</span>
+          <span class="stack-tag">GraphQL</span>
+        </div>
+      </div>
+      <div class="stack-category reveal-up rd2">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" stroke="#00f0ff" stroke-width="1.5"/></svg>
+          <span>Infrastructure</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">AWS</span>
+          <span class="stack-tag">Azure</span>
+          <span class="stack-tag">Docker</span>
+          <span class="stack-tag">Kubernetes</span>
+          <span class="stack-tag">CI/CD</span>
+        </div>
+      </div>
+      <div class="stack-category reveal-up rd3">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="5" rx="9" ry="3" stroke="#00f0ff" stroke-width="1.5"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="#00f0ff" stroke-width="1.5"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="#00f0ff" stroke-width="1.5"/></svg>
+          <span>Database</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">PostgreSQL</span>
+          <span class="stack-tag">MongoDB</span>
+          <span class="stack-tag">Redis</span>
+          <span class="stack-tag">MySQL</span>
+        </div>
+      </div>
+      <div class="stack-category reveal-up rd4">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#00f0ff" stroke-width="1.5"/></svg>
+          <span>Security & Compliance</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">GDPR-ready</span>
+          <span class="stack-tag">OAuth 2.0</span>
+          <span class="stack-tag">JWT</span>
+          <span class="stack-tag">TLS</span>
+          <span class="stack-tag">SOC2-aligned</span>
+        </div>
+      </div>
+      <div class="stack-category reveal-up rd5">
+        <div class="stack-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 20h9" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="#00f0ff" stroke-width="1.5"/></svg>
+          <span>Methodology</span>
+        </div>
+        <div class="stack-tags">
+          <span class="stack-tag">Agile/Scrum</span>
+          <span class="stack-tag">Git Flow</span>
+          <span class="stack-tag">Code Review</span>
+          <span class="stack-tag">TDD</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CONTACT ═══════════ -->
+  <section class="section" id="contact">
+    <div class="section-header">
+      <div class="reveal-up">
+        <span class="section-tag">Contact</span>
+      </div>
+      <div class="reveal-up rd1">
+        <h2 class="section-title">Let's Discuss<br><em>Your Project.</em></h2>
+        <p class="section-desc">We engage with clients who need structured, long-term engineering partners. Reach out to begin.</p>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info reveal-up">
+        <div class="contact-row">
+          <span class="contact-key">Email</span>
+          <span class="contact-val"><a href="mailto:m.ammarkhan067@gmail.com">m.ammarkhan067@gmail.com</a></span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-key">WhatsApp</span>
+          <span class="contact-val"><a href="https://wa.me/923045588455">+92 304 5588455</a></span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-key">Location</span>
+          <span class="contact-val">Pakistan — Serving Belgium & EU</span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-key">Markets</span>
+          <span class="contact-val">European SMEs · Logistics · SaaS · Industrial</span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-key">Response</span>
+          <span class="contact-val">Within 24 business hours</span>
+        </div>
+        <div class="contact-social">
+          <a href="mailto:m.ammarkhan067@gmail.com" class="social-link" aria-label="Email" id="social-email">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" stroke="currentColor" stroke-width="1.5"/></svg>
+          </a>
+          <a href="https://wa.me/923045588455" class="social-link" aria-label="WhatsApp" id="social-whatsapp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </a>
+        </div>
+      </div>
+      <form class="contact-form reveal-up rd1" id="contact-form" onsubmit="return false;">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name</label>
+            <input type="text" class="form-input" id="firstName" placeholder="Jan" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name</label>
+            <input type="text" class="form-input" id="lastName" placeholder="De Smedt" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="company">Company</label>
+          <input type="text" class="form-input" id="company" placeholder="Your organisation">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email</label>
+          <input type="email" class="form-input" id="email" placeholder="jan@company.be" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="service">Service Required</label>
+          <select class="form-select" id="service">
+            <option value="">Select a service</option>
+            <option>Custom Software Development</option>
+            <option>SaaS Architecture & Development</option>
+            <option>Enterprise Web Application</option>
+            <option>API & Systems Integration</option>
+            <option>Cloud Infrastructure & DevOps</option>
+            <option>Technical Audit & Optimization</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="brief">Project Brief</label>
+          <textarea class="form-textarea" id="brief" placeholder="Describe your requirements, timeline, and expected scale..." rows="5"></textarea>
+        </div>
+        <button type="submit" class="btn-primary btn-submit" id="btn-submit">
+          <span>Submit Enquiry</span>
+          <div class="btn-shimmer"></div>
+        </button>
+        <div class="form-success" id="form-success">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#00f0ff" stroke-width="1.5"/><polyline points="16 8 10 16 7 13" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Thank you! We'll be in touch within 24 hours.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer id="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <polyline points="4,24 8.5,9 13,24" stroke="#00f0ff" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+            <line x1="5.8" y1="18.5" x2="11.2" y2="18.5" stroke="#00f0ff" stroke-width="1.3"/>
+            <line x1="14.5" y1="9" x2="14.5" y2="24" stroke="#ffffff" stroke-width="1.3"/>
+            <line x1="14.5" y1="16.5" x2="20" y2="9" stroke="#ffffff" stroke-width="1.3"/>
+            <line x1="14.5" y1="16.5" x2="20" y2="24" stroke="#ffffff" stroke-width="1.3"/>
+            <path d="M22 13.5Q22 9.5 25 9.5Q28 9.5 28 12.5Q28 16.5 23.5 16.5Q21.5 16.5 21.5 20Q21.5 24 25 24Q28 24 28 21.5" stroke="#C2A24D" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span class="footer-wordmark">AKS<span class="accent-dot">.</span></span>
+        </div>
+        <p class="footer-tagline">Engineering digital infrastructure for European and growth-oriented businesses.</p>
+        <div class="footer-contact">
+          <a href="mailto:m.ammarkhan067@gmail.com">m.ammarkhan067@gmail.com</a><br>
+          <a href="https://wa.me/923045588455">+92 304 5588455</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="#services">Custom Software</a></li>
+          <li><a href="#services">SaaS Development</a></li>
+          <li><a href="#services">Enterprise Apps</a></li>
+          <li><a href="#services">API Integration</a></li>
+          <li><a href="#services">Cloud & DevOps</a></li>
+          <li><a href="#services">Technical Audits</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#work">Selected Work</a></li>
+          <li><a href="#stack">Technology</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Markets</h5>
+        <ul>
+          <li><a href="#contact">Belgium</a></li>
+          <li><a href="#contact">Netherlands</a></li>
+          <li><a href="#contact">Germany</a></li>
+          <li><a href="#contact">United Kingdom</a></li>
+          <li><a href="#contact">Pakistan</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 AKS Solutions. All rights reserved.</span>
+      <span class="footer-reg">Engineering Digital Infrastructure</span>
+    </div>
+  </footer>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

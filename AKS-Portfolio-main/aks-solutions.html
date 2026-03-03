@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AKS Solutions — Engineering Digital Infrastructure</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --ink:       #0F1115;
+  --ink-soft:  #2A2D34;
+  --white:     #FFFFFF;
+  --paper:     #F5F5F3;
+  --rule:      #E0DFDC;
+  --rule-soft: #ECECEA;
+  --muted:     #8C8C88;
+  --gold:      #C2A24D;
+  --gold-dim:  rgba(194,162,77,0.15);
+  --ff-head:   'Barlow Condensed', sans-serif;
+  --ff-body:   'Barlow', sans-serif;
+  --ease:      cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--ff-body);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CURSOR */
+#cur-dot {
+  width: 6px; height: 6px;
+  background: var(--ink);
+  border-radius: 50%;
+  position: fixed; z-index: 9999;
+  pointer-events: none;
+  transform: translate(-50%,-50%);
+  transition: background 0.2s, transform 0.15s;
+}
+#cur-ring {
+  width: 28px; height: 28px;
+  border: 1px solid rgba(15,17,21,0.25);
+  border-radius: 50%;
+  position: fixed; z-index: 9998;
+  pointer-events: none;
+  transform: translate(-50%,-50%);
+  transition: opacity 0.2s;
+}
+body.lh #cur-dot { transform: translate(-50%,-50%) scale(2.5); background: var(--gold); }
+body.lh #cur-ring { opacity: 0; }
+
+/* TYPE */
+.t-label {
+  font-family: var(--ff-body);
+  font-size: 0.67rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.t-label-muted { color: var(--muted); }
+.t-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+/* NAV */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  height: 60px;
+  background: var(--white);
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: stretch;
+  transition: box-shadow 0.3s;
+}
+#nav.elevated { box-shadow: 0 2px 24px rgba(0,0,0,0.06); }
+
+.nav-brand-cell {
+  width: 220px;
+  display: flex; align-items: center;
+  padding: 0 24px;
+  border-right: 1px solid var(--rule);
+  gap: 11px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.nav-wordmark {
+  font-family: var(--ff-head);
+  font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--ink); line-height: 1;
+}
+.nav-wordmark span { color: var(--gold); }
+
+.nav-links {
+  display: flex; align-items: center;
+  padding: 0 32px; gap: 2rem;
+  list-style: none; flex: 1;
+}
+.nav-links a {
+  font-size: 0.71rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+
+.nav-contact-cell {
+  display: flex; align-items: center;
+  padding: 0 28px; border-left: 1px solid var(--rule); margin-left: auto;
+}
+.nav-cta-btn {
+  font-family: var(--ff-body);
+  font-size: 0.7rem; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink); text-decoration: none;
+  display: flex; align-items: center; gap: 10px;
+  transition: color 0.2s;
+}
+.nav-cta-btn:hover { color: var(--gold); }
+.cta-line {
+  width: 20px; height: 1px;
+  background: currentColor;
+  position: relative; transition: width 0.3s;
+}
+.nav-cta-btn:hover .cta-line { width: 30px; }
+.cta-line::after {
+  content: '';
+  position: absolute; right: 0; top: -3px;
+  width: 6px; height: 6px;
+  border-right: 1px solid currentColor;
+  border-top: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--rule);
+  margin-top: 60px;
+}
+.hero-content {
+  padding: 80px 60px 80px 8%;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid var(--rule);
+  position: relative;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 48px;
+  opacity: 0; animation: riseIn 0.8s 0.3s var(--ease) forwards;
+}
+.eyebrow-line { width: 28px; height: 1px; background: var(--gold); }
+
+.hero-h1 {
+  font-family: var(--ff-head);
+  font-size: clamp(3rem, 5.5vw, 5.8rem);
+  font-weight: 300; line-height: 1.0;
+  letter-spacing: -0.01em; color: var(--ink);
+  margin-bottom: 36px;
+  opacity: 0; animation: riseIn 0.9s 0.5s var(--ease) forwards;
+}
+.hero-h1 strong { font-weight: 700; display: block; }
+.hero-h1 em { font-style: normal; color: var(--gold); }
+
+.hero-desc {
+  font-size: 0.94rem; font-weight: 300;
+  color: var(--muted); line-height: 1.9;
+  max-width: 420px; margin-bottom: 56px;
+  opacity: 0; animation: riseIn 0.9s 0.7s var(--ease) forwards;
+}
+.hero-actions {
+  display: flex; align-items: center; gap: 32px;
+  opacity: 0; animation: riseIn 0.9s 0.9s var(--ease) forwards;
+}
+.hero-coord {
+  position: absolute; bottom: 32px; left: 8%;
+  opacity: 0; animation: fadeIn 1s 1.3s forwards;
+}
+
+.btn-solid {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 14px 28px;
+  background: var(--ink); color: var(--white);
+  font-family: var(--ff-body);
+  font-size: 0.71rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  text-decoration: none; border: 1px solid var(--ink);
+  transition: background 0.25s, color 0.25s;
+}
+.btn-solid:hover { background: transparent; color: var(--ink); }
+
+.btn-ghost {
+  font-size: 0.71rem; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  border-bottom: 1px solid var(--rule); padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { color: var(--ink); border-color: var(--ink); }
+
+.hero-visual {
+  background: var(--paper);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+#heroCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.hero-pills {
+  position: absolute; bottom: 40px; right: 40px;
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+  opacity: 0; animation: fadeIn 1s 1.2s forwards;
+}
+.hp {
+  font-size: 0.62rem; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(255,255,255,0.88);
+  border: 1px solid var(--rule);
+  padding: 5px 12px;
+}
+
+.scroll-indicator {
+  position: absolute; right: 36px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  opacity: 0; animation: fadeIn 1s 1.5s forwards;
+}
+.si-track {
+  width: 1px; height: 60px;
+  background: var(--rule); overflow: hidden; position: relative;
+}
+.si-fill {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 50%; background: var(--gold);
+  animation: siRun 2s ease-in-out infinite;
+}
+@keyframes siRun { 0%{top:-50%} 100%{top:120%} }
+.si-text {
+  writing-mode: vertical-rl;
+  font-size: 0.58rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* METRICS */
+#metrics {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  border-bottom: 1px solid var(--rule);
+}
+.m-cell {
+  padding: 36px 40px;
+  border-right: 1px solid var(--rule);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.m-cell:last-child { border-right: none; }
+.m-val {
+  font-family: var(--ff-head);
+  font-size: 2.6rem; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1; color: var(--ink);
+}
+.m-val sup { font-size: 1rem; font-weight: 600; color: var(--gold); vertical-align: super; }
+.m-desc { font-size: 0.74rem; color: var(--muted); letter-spacing: 0.03em; line-height: 1.4; }
+
+/* SECTION SHELL */
+.sec { padding: 96px 8%; border-bottom: 1px solid var(--rule); }
+.sec-alt { background: var(--paper); }
+.sec-dark { background: var(--ink); color: var(--white); }
+
+.sec-top {
+  display: grid; grid-template-columns: 220px 1fr;
+  gap: 80px; margin-bottom: 64px; align-items: start;
+}
+.sec-h2 {
+  font-family: var(--ff-head);
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 600; letter-spacing: -0.015em; line-height: 1.1; color: var(--ink);
+}
+.sec-dark .sec-h2 { color: var(--white); }
+.sec-lead {
+  font-size: 0.88rem; font-weight: 300; color: var(--muted);
+  line-height: 1.95; max-width: 520px; margin-top: 18px;
+}
+
+/* SERVICES */
+.svc-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+.svc-item {
+  padding: 40px 36px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  position: relative; overflow: hidden;
+  transition: background 0.25s;
+}
+.svc-item::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 0; height: 2px; background: var(--gold);
+  transition: width 0.4s var(--ease);
+}
+.svc-item:hover { background: var(--white); }
+.svc-item:hover::before { width: 100%; }
+.svc-n { font-size: 0.64rem; font-weight: 500; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; }
+.svc-title {
+  font-family: var(--ff-head);
+  font-size: 1.12rem; font-weight: 600; letter-spacing: 0.01em; line-height: 1.25;
+  margin-bottom: 12px; color: var(--ink);
+}
+.svc-body { font-size: 0.82rem; font-weight: 300; color: var(--muted); line-height: 1.82; }
+
+/* APPROACH */
+.approach-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+.steps { display: flex; flex-direction: column; }
+.step {
+  display: grid; grid-template-columns: 52px 1fr;
+  gap: 20px; padding: 30px 0;
+  border-bottom: 1px solid var(--rule);
+  transition: padding-left 0.3s var(--ease);
+}
+.step:first-child { border-top: 1px solid var(--rule); }
+.step:hover { padding-left: 12px; }
+.step-n { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.14em; color: var(--gold); padding-top: 2px; }
+.step-title { font-family: var(--ff-head); font-size: 1rem; font-weight: 600; margin-bottom: 7px; color: var(--ink); }
+.step-body { font-size: 0.83rem; font-weight: 300; color: var(--muted); line-height: 1.8; }
+.approach-fig {
+  position: sticky; top: 80px;
+  background: var(--paper); border: 1px solid var(--rule);
+  aspect-ratio: 4/3; overflow: hidden;
+}
+
+/* PORTFOLIO */
+.pf-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--rule); border-left: 1px solid var(--rule);
+}
+.pf-item {
+  border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  aspect-ratio: 4/3;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.pf-wide { grid-column: span 2; aspect-ratio: 8/3; }
+.pf-bg { position: absolute; inset: 0; transition: transform 0.7s var(--ease); }
+.pf-item:hover .pf-bg { transform: scale(1.04); }
+.pb1 { background: #141820; }
+.pb2 { background: #0d1810; }
+.pb3 { background: #18140e; }
+.pf-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.pf-fade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%); opacity: 0; transition: opacity 0.4s; }
+.pf-item:hover .pf-fade { opacity: 1; }
+.pf-meta {
+  position: relative; z-index: 2;
+  padding: 26px 30px;
+  transform: translateY(8px); opacity: 0;
+  transition: all 0.35s var(--ease);
+}
+.pf-item:hover .pf-meta { transform: none; opacity: 1; }
+.pf-tag { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
+.pf-name { font-family: var(--ff-head); font-size: 1.6rem; font-weight: 600; color: #fff; }
+.pf-static {
+  position: absolute; bottom: 22px; left: 30px;
+  z-index: 2; font-family: var(--ff-head); font-size: 0.7rem;
+  font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.3); transition: opacity 0.3s;
+}
+.pf-item:hover .pf-static { opacity: 0; }
+
+/* DARK CALLOUT */
+.dark-callout {
+  background: var(--ink); padding: 80px 8%;
+  border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 80px; align-items: center;
+}
+.dc-text {
+  font-family: var(--ff-head);
+  font-size: clamp(1.5rem, 3vw, 2.8rem);
+  font-weight: 300; line-height: 1.25;
+  letter-spacing: -0.01em; color: var(--white);
+}
+.dc-text strong { font-weight: 700; display: block; }
+.dc-text em { font-style: normal; color: var(--gold); }
+.dc-cta {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 16px 32px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--white);
+  font-family: var(--ff-body);
+  font-size: 0.7rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap;
+  transition: border-color 0.25s, background 0.25s;
+}
+.dc-cta:hover { border-color: var(--gold); background: var(--gold-dim); }
+
+/* CLIENTS */
+#clients {
+  padding: 40px 8%;
+  border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: 160px 1fr;
+  gap: 48px; align-items: center;
+}
+.cl-label { border-right: 1px solid var(--rule); padding-right: 48px; }
+.cl-row { display: flex; gap: 48px; align-items: center; flex-wrap: wrap; }
+.cl-name {
+  font-family: var(--ff-head);
+  font-size: 0.73rem; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--rule); transition: color 0.2s;
+}
+.cl-name:hover { color: var(--muted); }
+
+/* ABOUT */
+.about-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.about-body { font-size: 0.88rem; font-weight: 300; color: var(--muted); line-height: 1.95; margin-bottom: 18px; }
+.about-pull {
+  margin-top: 32px; padding: 22px 26px;
+  border-left: 2px solid var(--gold); background: var(--paper);
+}
+.about-pull p { font-family: var(--ff-head); font-size: 1.02rem; font-weight: 500; line-height: 1.5; font-style: italic; color: var(--ink); }
+.about-fig { background: var(--paper); border: 1px solid var(--rule); aspect-ratio: 5/4; overflow: hidden; }
+
+/* STACK */
+.stack-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  border-top: 1px solid var(--rule); border-left: 1px solid var(--rule);
+}
+.stack-cat {
+  padding: 34px 30px;
+  border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+}
+.stack-head {
+  font-size: 0.63rem; font-weight: 500;
+  letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+.tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.tag {
+  font-size: 0.74rem; font-weight: 400;
+  color: var(--muted); border: 1px solid var(--rule);
+  padding: 5px 11px; transition: all 0.2s; cursor: none;
+}
+.tag:hover { border-color: var(--ink); color: var(--ink); }
+
+/* CONTACT */
+.contact-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 80px; align-items: start; }
+.c-row {
+  display: grid; grid-template-columns: 100px 1fr;
+  gap: 20px; padding: 19px 0; border-bottom: 1px solid var(--rule);
+  align-items: baseline;
+}
+.c-row:first-child { border-top: 1px solid var(--rule); }
+.ck { font-size: 0.63rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.cv { font-size: 0.87rem; color: var(--ink); }
+.cv a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); transition: border-color 0.2s, color 0.2s; }
+.cv a:hover { border-color: var(--gold); color: var(--gold); }
+
+.form { display: flex; flex-direction: column; gap: 18px; }
+.form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fl { font-size: 0.63rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+.fi, .fsel, .fta {
+  background: var(--paper); border: 1px solid var(--rule);
+  padding: 12px 14px;
+  font-family: var(--ff-body); font-size: 0.84rem; color: var(--ink);
+  outline: none; transition: border-color 0.2s;
+  -webkit-appearance: none; border-radius: 0;
+}
+.fi:focus, .fsel:focus, .fta:focus { border-color: var(--ink); }
+.fta { resize: vertical; min-height: 110px; }
+.f-sub {
+  align-self: flex-start; padding: 13px 26px;
+  background: var(--ink); color: var(--white);
+  font-family: var(--ff-body); font-size: 0.7rem; font-weight: 500;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  border: 1px solid var(--ink); cursor: none;
+  transition: background 0.25s, color 0.25s;
+}
+.f-sub:hover { background: transparent; color: var(--ink); }
+
+/* FOOTER */
+#footer { background: var(--ink); color: var(--white); padding: 64px 8% 0; }
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 56px; padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.f-brand { display: flex; align-items: center; gap: 11px; margin-bottom: 16px; }
+.f-brand-name { font-family: var(--ff-head); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; }
+.f-brand-name span { color: var(--gold); }
+.f-tagline { font-size: 0.82rem; font-weight: 300; color: rgba(255,255,255,0.32); line-height: 1.8; max-width: 300px; margin-bottom: 18px; }
+.f-contact { font-size: 0.78rem; color: rgba(255,255,255,0.28); line-height: 1.9; }
+.f-contact a { color: rgba(255,255,255,0.42); text-decoration: none; transition: color 0.2s; }
+.f-contact a:hover { color: var(--gold); }
+.f-col h5 { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.22); margin-bottom: 18px; }
+.f-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.f-list a { font-size: 0.82rem; font-weight: 300; color: rgba(255,255,255,0.42); text-decoration: none; transition: color 0.2s; }
+.f-list a:hover { color: var(--white); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; flex-wrap: wrap; gap: 12px; }
+.f-copy { font-size: 0.7rem; color: rgba(255,255,255,0.18); font-weight: 300; }
+.f-reg { font-family: var(--ff-head); font-size: 0.6rem; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.13); }
+
+/* REVEAL */
+.r { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.r.on { opacity: 1; transform: none; }
+.rd1 { transition-delay: 0.1s; } .rd2 { transition-delay: 0.2s; } .rd3 { transition-delay: 0.3s; }
+
+@keyframes riseIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform:none; } }
+@keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  #hero { grid-template-columns: 1fr; }
+  .hero-content { border-right: none; padding: 64px 6%; }
+  .hero-visual { min-height: 360px; }
+  .svc-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .sec-top { grid-template-columns: 160px 1fr; gap: 40px; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  #metrics { grid-template-columns: 1fr 1fr; }
+  .svc-grid, .stack-grid { grid-template-columns: 1fr; }
+  .pf-grid { grid-template-columns: 1fr; }
+  .pf-wide { grid-column: span 1; aspect-ratio: 4/3; }
+  .approach-layout, .about-layout, .contact-layout { grid-template-columns: 1fr; gap: 40px; }
+  .sec-top { grid-template-columns: 1fr; gap: 14px; }
+  #clients { grid-template-columns: 1fr; }
+  .cl-label { border-right: none; padding-right: 0; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .form-row2 { grid-template-columns: 1fr; }
+  .dark-callout { grid-template-columns: 1fr; gap: 32px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ══ NAV ══ -->
+<nav id="nav">
+  <a href="#" class="nav-brand-cell">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect x=".5" y=".5" width="31" height="31" stroke="#0F1115" stroke-width=".75"/>
+      <polyline points="4,24 8.5,9 13,24" stroke="#0F1115" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+      <line x1="5.8" y1="18.5" x2="11.2" y2="18.5" stroke="#0F1115" stroke-width="1.2"/>
+      <line x1="14.5" y1="9" x2="14.5" y2="24" stroke="#0F1115" stroke-width="1.2"/>
+      <line x1="14.5" y1="16.5" x2="20" y2="9" stroke="#0F1115" stroke-width="1.2"/>
+      <line x1="14.5" y1="16.5" x2="20" y2="24" stroke="#0F1115" stroke-width="1.2"/>
+      <path d="M22 13.5Q22 9.5 25 9.5Q28 9.5 28 12.5Q28 16.5 23.5 16.5Q21.5 16.5 21.5 20Q21.5 24 25 24Q28 24 28 21.5" stroke="#C2A24D" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-wordmark">AKS<span>.</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#approach">Approach</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#stack">Technology</a></li>
+  </ul>
+  <div class="nav-contact-cell">
+    <a href="#contact" class="nav-cta-btn">Start a Project <span class="cta-line"></span></a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-line"></span>
+      <span class="t-label">Engineering Digital Infrastructure</span>
+    </div>
+    <h1 class="hero-h1">Secure.<br>Scalable.<br><strong>Structured <em>Systems.</em></strong></h1>
+    <p class="hero-desc">We architect and deliver enterprise-grade software for European SMEs, logistics companies, and SaaS startups — built for operational longevity and compliance.</p>
+    <div class="hero-actions">
+      <a href="#services" class="btn-solid">Our Services</a>
+      <a href="#contact" class="btn-ghost">Start a Project</a>
+    </div>
+    <div class="hero-coord"><span class="t-mono">50°51'N 4°21'E — Belgium &amp; EU Market</span></div>
+  </div>
+  <div class="hero-visual">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-pills">
+      <span class="hp">GDPR-compliant</span>
+      <span class="hp">Enterprise-grade</span>
+      <span class="hp">Registered · Pakistan</span>
+    </div>
+    <div class="scroll-indicator">
+      <div class="si-track"><div class="si-fill"></div></div>
+      <span class="si-text">Scroll</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ METRICS ══ -->
+<div id="metrics">
+  <div class="m-cell r"><div class="m-val"><span class="cnt" data-to="8">0</span><sup>+</sup></div><div class="m-desc">Years in operation</div></div>
+  <div class="m-cell r rd1"><div class="m-val"><span class="cnt" data-to="50">0</span><sup>+</sup></div><div class="m-desc">Clients across Europe &amp; Pakistan</div></div>
+  <div class="m-cell r rd2"><div class="m-val"><span class="cnt" data-to="150">0</span><sup>+</sup></div><div class="m-desc">Systems delivered</div></div>
+  <div class="m-cell r rd3"><div class="m-val"><span class="cnt" data-to="99">0</span><sup>%</sup></div><div class="m-desc">On-time delivery rate</div></div>
+</div>
+
+<!-- ══ CLIENTS ══ -->
+<div id="clients">
+  <div class="cl-label"><span class="t-label t-label-muted">Trusted By</span></div>
+  <div class="cl-row">
+    <span class="cl-name">Logistics EU</span>
+    <span class="cl-name">TechSME Belgium</span>
+    <span class="cl-name">IndustrialX</span>
+    <span class="cl-name">SaaS Group</span>
+    <span class="cl-name">EnterpriseCore</span>
+    <span class="cl-name">NovaTech BE</span>
+  </div>
+</div>
+
+<!-- ══ SERVICES ══ -->
+<section class="sec sec-alt" id="services">
+  <div class="sec-top r">
+    <div><span class="t-label">Services</span></div>
+    <div>
+      <h2 class="sec-h2">Engineering Partner,<br>Not Vendor.</h2>
+      <p class="sec-lead">We embed with your team to architect, build, and operate digital systems tailored precisely to your operational requirements.</p>
+    </div>
+  </div>
+  <div class="svc-grid r rd1">
+    <div class="svc-item"><div class="svc-n">01</div><h3 class="svc-title">Custom Software Development</h3><p class="svc-body">Bespoke applications built from first principles — no templates, no off-the-shelf shortcuts. Designed around your exact business logic.</p></div>
+    <div class="svc-item"><div class="svc-n">02</div><h3 class="svc-title">SaaS Architecture &amp; Development</h3><p class="svc-body">Multi-tenant SaaS platforms engineered for performance, security isolation, and subscription-based commercial models.</p></div>
+    <div class="svc-item"><div class="svc-n">03</div><h3 class="svc-title">Enterprise Web Applications</h3><p class="svc-body">Complex, data-intensive web systems for internal operations or external users — reliable, compliant, and built to last.</p></div>
+    <div class="svc-item"><div class="svc-n">04</div><h3 class="svc-title">API &amp; Systems Integration</h3><p class="svc-body">Connecting third-party tools, legacy infrastructure, and modern APIs into a coherent, well-documented technical layer.</p></div>
+    <div class="svc-item"><div class="svc-n">05</div><h3 class="svc-title">Cloud Infrastructure &amp; DevOps</h3><p class="svc-body">Secure, automated deployment pipelines and cloud environments on AWS or Azure — built to scale without breaking.</p></div>
+    <div class="svc-item"><div class="svc-n">06</div><h3 class="svc-title">Technical Audits &amp; Optimization</h3><p class="svc-body">Structured review of existing systems — identifying performance bottlenecks, security vulnerabilities, and architectural debt.</p></div>
+  </div>
+</section>
+
+<!-- ══ WORK ══ -->
+<section class="sec" id="work" style="padding-bottom:0;">
+  <div class="sec-top r">
+    <div><span class="t-label">Selected Work</span></div>
+    <div><h2 class="sec-h2">Projects That<br>Define Us.</h2></div>
+  </div>
+  <div class="pf-grid r rd1">
+    <div class="pf-item pf-wide">
+      <div class="pf-bg pb1"></div>
+      <div class="pf-fade"></div>
+      <span class="pf-static">LogiFlow — Logistics Management Platform</span>
+      <div class="pf-meta"><div class="pf-tag">Logistics · SaaS · API Integration</div><div class="pf-name">LogiFlow</div></div>
+    </div>
+    <div class="pf-item">
+      <div class="pf-bg pb2"></div>
+      <div class="pf-fade"></div>
+      <span class="pf-static">VaultPay — Fintech Platform</span>
+      <div class="pf-meta"><div class="pf-tag">Fintech · Cloud · GDPR</div><div class="pf-name">VaultPay</div></div>
+    </div>
+    <div class="pf-item">
+      <div class="pf-bg pb3"></div>
+      <div class="pf-fade"></div>
+      <span class="pf-static">IndustrialOS — Factory Software</span>
+      <div class="pf-meta"><div class="pf-tag">Industrial · Enterprise · IoT</div><div class="pf-name">IndustrialOS</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DARK CALLOUT ══ -->
+<div class="dark-callout r">
+  <p class="dc-text">We architect <em>secure, scalable</em> digital systems built<br><strong>for operational longevity and European compliance.</strong></p>
+  <a href="#contact" class="dc-cta">Start a Conversation</a>
+</div>
+
+<!-- ══ APPROACH ══ -->
+<section class="sec sec-alt" id="approach">
+  <div class="sec-top r">
+    <div><span class="t-label">Approach</span></div>
+    <div>
+      <h2 class="sec-h2">How We Work.</h2>
+      <p class="sec-lead">A structured methodology developed across 150+ delivered systems. Systematic, transparent, repeatable.</p>
+    </div>
+  </div>
+  <div class="approach-layout r rd1">
+    <div class="steps">
+      <div class="step"><div class="step-n">01</div><div><div class="step-title">Discovery &amp; Scoping</div><p class="step-body">We map business requirements, user flows, and technical constraints before writing a single line of code.</p></div></div>
+      <div class="step"><div class="step-n">02</div><div><div class="step-title">System Architecture</div><p class="step-body">We design the complete technical blueprint — infrastructure topology, data models, API contracts, and security boundaries.</p></div></div>
+      <div class="step"><div class="step-n">03</div><div><div class="step-title">Iterative Engineering</div><p class="step-body">Structured two-week sprints with live demos, continuous delivery, and full transparency throughout.</p></div></div>
+      <div class="step"><div class="step-n">04</div><div><div class="step-title">Deployment &amp; Handover</div><p class="step-body">Rigorous QA, staged rollout, comprehensive documentation, and knowledge transfer to your team.</p></div></div>
+    </div>
+    <div class="approach-fig"><canvas id="archCanvas"></canvas></div>
+  </div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section class="sec" id="about">
+  <div class="about-layout r">
+    <div>
+      <div style="margin-bottom:30px;"><span class="t-label">About AKS Solutions</span></div>
+      <h2 class="sec-h2" style="margin-bottom:26px;">Built on Precision.<br>Oriented Toward Longevity.</h2>
+      <p class="about-body">AKS Solutions is a boutique software engineering firm registered in Pakistan, delivering structured, secure digital infrastructure primarily for European clients — with a focus on Belgian and broader EU SMEs, logistics operators, and industrial businesses.</p>
+      <p class="about-body">We are not a generalist agency. We select engagements where our depth in systems architecture, backend engineering, and cloud infrastructure creates measurable, lasting value.</p>
+      <div class="about-pull"><p>"A serious engineering firm — stable, competent, and long-term oriented."</p></div>
+    </div>
+    <div class="about-fig"><canvas id="aboutCanvas"></canvas></div>
+  </div>
+</section>
+
+<!-- ══ TECHNOLOGY ══ -->
+<section class="sec sec-alt" id="stack">
+  <div class="sec-top r">
+    <div><span class="t-label">Technology</span></div>
+    <div>
+      <h2 class="sec-h2">Selected<br>Technology Stack.</h2>
+      <p class="sec-lead">Battle-tested technologies chosen for reliability, maintainability, and long-term operational integrity.</p>
+    </div>
+  </div>
+  <div class="stack-grid r rd1">
+    <div class="stack-cat"><div class="stack-head">Frontend</div><div class="tags"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Vue.js</span><span class="tag">Tailwind</span></div></div>
+    <div class="stack-cat"><div class="stack-head">Backend</div><div class="tags"><span class="tag">Node.js</span><span class="tag">Python</span><span class="tag">Go</span><span class="tag">REST APIs</span><span class="tag">GraphQL</span></div></div>
+    <div class="stack-cat"><div class="stack-head">Infrastructure</div><div class="tags"><span class="tag">AWS</span><span class="tag">Azure</span><span class="tag">Docker</span><span class="tag">Kubernetes</span><span class="tag">CI/CD</span></div></div>
+    <div class="stack-cat"><div class="stack-head">Database</div><div class="tags"><span class="tag">PostgreSQL</span><span class="tag">MongoDB</span><span class="tag">Redis</span><span class="tag">MySQL</span></div></div>
+    <div class="stack-cat"><div class="stack-head">Security &amp; Compliance</div><div class="tags"><span class="tag">GDPR-ready</span><span class="tag">OAuth 2.0</span><span class="tag">JWT</span><span class="tag">TLS</span><span class="tag">SOC2-aligned</span></div></div>
+    <div class="stack-cat"><div class="stack-head">Methodology</div><div class="tags"><span class="tag">Agile/Scrum</span><span class="tag">Git Flow</span><span class="tag">Code Review</span><span class="tag">TDD</span></div></div>
+  </div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section class="sec" id="contact">
+  <div class="sec-top r">
+    <div><span class="t-label">Contact</span></div>
+    <div>
+      <h2 class="sec-h2">Let's Discuss<br>Your Project.</h2>
+      <p class="sec-lead">We engage with clients who need structured, long-term engineering partners. Reach out to begin.</p>
+    </div>
+  </div>
+  <div class="contact-layout r rd1">
+    <div>
+      <div class="c-row"><span class="ck">Email</span><span class="cv"><a href="mailto:m.ammarkhan067@gmail.com">m.ammarkhan067@gmail.com</a></span></div>
+      <div class="c-row"><span class="ck">WhatsApp</span><span class="cv"><a href="https://wa.me/923045588455">+92 304 5588455</a></span></div>
+      <div class="c-row"><span class="ck">Location</span><span class="cv">Pakistan — Serving Belgium &amp; EU</span></div>
+      <div class="c-row"><span class="ck">Markets</span><span class="cv">European SMEs · Logistics · SaaS · Industrial</span></div>
+      <div class="c-row"><span class="ck">Response</span><span class="cv">Within 24 business hours</span></div>
+    </div>
+    <form class="form" onsubmit="return false;">
+      <div class="form-row2">
+        <div class="fg"><label class="fl">First Name</label><input type="text" class="fi" placeholder="Jan"></div>
+        <div class="fg"><label class="fl">Last Name</label><input type="text" class="fi" placeholder="De Smedt"></div>
+      </div>
+      <div class="fg"><label class="fl">Company</label><input type="text" class="fi" placeholder="Your organisation"></div>
+      <div class="fg"><label class="fl">Email</label><input type="email" class="fi" placeholder="jan@company.be"></div>
+      <div class="fg">
+        <label class="fl">Service Required</label>
+        <select class="fsel">
+          <option value="">Select a service</option>
+          <option>Custom Software Development</option>
+          <option>SaaS Architecture &amp; Development</option>
+          <option>Enterprise Web Application</option>
+          <option>API &amp; Systems Integration</option>
+          <option>Cloud Infrastructure &amp; DevOps</option>
+          <option>Technical Audit &amp; Optimization</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Project Brief</label><textarea class="fta" placeholder="Describe your requirements, timeline, and expected scale..."></textarea></div>
+      <button type="submit" class="f-sub">Submit Enquiry</button>
+    </form>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer id="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="f-brand">
+        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+          <rect x=".5" y=".5" width="31" height="31" stroke="rgba(255,255,255,0.18)" stroke-width=".75"/>
+          <polyline points="4,24 8.5,9 13,24" stroke="white" stroke-width="1.2" fill="none"/>
+          <line x1="5.8" y1="18.5" x2="11.2" y2="18.5" stroke="white" stroke-width="1.2"/>
+          <line x1="14.5" y1="9" x2="14.5" y2="24" stroke="white" stroke-width="1.2"/>
+          <line x1="14.5" y1="16.5" x2="20" y2="9" stroke="white" stroke-width="1.2"/>
+          <line x1="14.5" y1="16.5" x2="20" y2="24" stroke="white" stroke-width="1.2"/>
+          <path d="M22 13.5Q22 9.5 25 9.5Q28 9.5 28 12.5Q28 16.5 23.5 16.5Q21.5 16.5 21.5 20Q21.5 24 25 24Q28 24 28 21.5" stroke="#C2A24D" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span class="f-brand-name">AKS<span>.</span></span>
+      </div>
+      <p class="f-tagline">Engineering digital infrastructure for European and growth-oriented businesses. Registered in Pakistan.</p>
+      <div class="f-contact">
+        <a href="mailto:m.ammarkhan067@gmail.com">m.ammarkhan067@gmail.com</a><br>
+        <a href="https://wa.me/923045588455">+92 304 5588455</a>
+      </div>
+    </div>
+    <div class="f-col"><h5>Services</h5><ul class="f-list"><li><a href="#">Custom Software</a></li><li><a href="#">SaaS Development</a></li><li><a href="#">Enterprise Apps</a></li><li><a href="#">API Integration</a></li><li><a href="#">Cloud &amp; DevOps</a></li><li><a href="#">Technical Audits</a></li></ul></div>
+    <div class="f-col"><h5>Company</h5><ul class="f-list"><li><a href="#">About</a></li><li><a href="#">Selected Work</a></li><li><a href="#">Technology</a></li><li><a href="#contact">Contact</a></li></ul></div>
+    <div class="f-col"><h5>Markets</h5><ul class="f-list"><li><a href="#">Belgium</a></li><li><a href="#">Netherlands</a></li><li><a href="#">Germany</a></li><li><a href="#">United Kingdom</a></li><li><a href="#">Pakistan</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <span class="f-copy">© 2026 AKS Solutions. All rights reserved.</span>
+    <span class="f-reg">Engineering Digital Infrastructure</span>
+  </div>
+</footer>
+
+<script>
+// CURSOR
+const dot=document.getElementById('cur-dot'), ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*0.13;ry+=(my-ry)*0.13;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.svc-item,.pf-item,.tag,.step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('lh'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('lh'));
+});
+
+// NAV
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('elevated',scrollY>20));
+
+// HERO CANVAS
+(()=>{
+  const c=document.getElementById('heroCanvas'),p=c.parentElement;
+  const rsz=()=>{c.width=p.offsetWidth;c.height=p.offsetHeight;};
+  rsz(); new ResizeObserver(rsz).observe(p);
+  const ctx=c.getContext('2d'); let t=0;
+  function draw(){
+    const W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#F5F5F3';ctx.fillRect(0,0,W,H);
+    // grid
+    ctx.strokeStyle='rgba(15,17,21,0.055)';ctx.lineWidth=0.5;
+    for(let x=0;x<=W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<=H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    // axis
+    ctx.strokeStyle='rgba(15,17,21,0.08)';ctx.lineWidth=0.8;
+    ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+    // diagonal structural
+    [[0.1,0.15,0.9,0.8],[0.05,0.88,0.95,0.12]].forEach(([x1,y1,x2,y2],i)=>{
+      ctx.beginPath();ctx.moveTo(x1*W,y1*H);ctx.lineTo(x2*W,y2*H);
+      ctx.strokeStyle=`rgba(194,162,77,${0.11+Math.sin(t+i)*0.04})`;ctx.lineWidth=0.7;ctx.stroke();
+    });
+    // crosshairs
+    [[0.5,0.5],[0.25,0.3],[0.75,0.65],[0.4,0.72],[0.7,0.28],[0.18,0.58]].forEach(([px,py],i)=>{
+      const x=px*W,y=py*H,a=0.16+Math.sin(t*.8+i*1.1)*.06;
+      ctx.strokeStyle=`rgba(15,17,21,${a})`;ctx.lineWidth=0.6;
+      ctx.beginPath();ctx.moveTo(x-12,y);ctx.lineTo(x+12,y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x,y-12);ctx.lineTo(x,y+12);ctx.stroke();
+      ctx.beginPath();ctx.arc(x,y,1.8,0,Math.PI*2);
+      ctx.fillStyle=i===0?`rgba(194,162,77,${.55+Math.sin(t)*.2})`:`rgba(15,17,21,${a*1.5})`;ctx.fill();
+    });
+    // measurement arc
+    ctx.beginPath();ctx.arc(W/2,H/2,58+Math.sin(t*.5)*4,0,Math.PI*2);
+    ctx.strokeStyle='rgba(194,162,77,0.11)';ctx.lineWidth=0.8;ctx.stroke();
+    // corner marks
+    [[20,20],[W-20,20],[20,H-20],[W-20,H-20]].forEach(([cx,cy])=>{
+      const sx=cx<W/2?1:-1,sy=cy<H/2?1:-1;
+      ctx.strokeStyle='rgba(15,17,21,0.16)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(cx,cy+sy*14);ctx.lineTo(cx,cy);ctx.lineTo(cx+sx*14,cy);ctx.stroke();
+    });
+    t+=0.011; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ARCH CANVAS
+(()=>{
+  const c=document.getElementById('archCanvas'),p=c.parentElement;
+  const rsz=()=>{c.width=p.offsetWidth;c.height=p.offsetHeight;};
+  rsz(); new ResizeObserver(rsz).observe(p);
+  const ctx=c.getContext('2d'); let t=0;
+  const nodes=[
+    {lx:.5,ly:.12,lb:'Client Layer'},
+    {lx:.5,ly:.35,lb:'API Gateway'},
+    {lx:.22,ly:.6,lb:'Auth Service'},
+    {lx:.5,ly:.6,lb:'Core Logic'},
+    {lx:.78,ly:.6,lb:'Integrations'},
+    {lx:.5,ly:.84,lb:'Data Layer'},
+  ];
+  const edges=[[0,1],[1,2],[1,3],[1,4],[2,5],[3,5],[4,5]];
+  function draw(){
+    const W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#F5F5F3';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;
+    for(let x=0;x<W;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    const abs=n=>({x:n.lx*W,y:n.ly*H});
+    ctx.setLineDash([3,5]);ctx.lineDashOffset=-t*8;
+    edges.forEach(([a,b])=>{
+      const pa=abs(nodes[a]),pb=abs(nodes[b]);
+      ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);
+      ctx.strokeStyle='rgba(15,17,21,0.09)';ctx.lineWidth=0.8;ctx.stroke();
+    });
+    ctx.setLineDash([]);ctx.lineDashOffset=0;
+    nodes.forEach((n,i)=>{
+      const {x,y}=abs(n),w=86,h=22;
+      ctx.fillStyle='rgba(0,0,0,0.04)';ctx.fillRect(x-w/2+1,y-h/2+2,w,h);
+      ctx.fillStyle='#FFF';ctx.fillRect(x-w/2,y-h/2,w,h);
+      ctx.strokeStyle=`rgba(15,17,21,${.13+Math.sin(t*1.1+i)*.04})`;ctx.lineWidth=0.8;ctx.strokeRect(x-w/2,y-h/2,w,h);
+      ctx.fillStyle=`rgba(194,162,77,${.4+Math.sin(t+i)*.18})`;ctx.fillRect(x-w/2,y-h/2,3,h);
+      ctx.fillStyle='#2A2D34';ctx.font="400 8.5px 'Barlow',sans-serif";ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(n.lb,x+2,y);
+    });
+    t+=0.012; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ABOUT CANVAS
+(()=>{
+  const c=document.getElementById('aboutCanvas'),p=c.parentElement;
+  const rsz=()=>{c.width=p.offsetWidth;c.height=p.offsetHeight;};
+  rsz(); new ResizeObserver(rsz).observe(p);
+  const ctx=c.getContext('2d'); let t=0;
+  function draw(){
+    const W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#F5F5F3';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(0,0,0,0.04)';ctx.lineWidth=0.5;
+    for(let x=0;x<W;x+=36){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=36){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    const cx=W/2,cy=H/2;
+    [80,130,180,230].forEach((r,i)=>{
+      ctx.strokeStyle=`rgba(194,162,77,${.09-i*.017})`;ctx.lineWidth=0.8;ctx.strokeRect(cx-r,cy-r,r*2,r*2);
+    });
+    const ang=t*.4,len=115;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(ang)*len,cy+Math.sin(ang)*len);
+    ctx.strokeStyle='rgba(194,162,77,0.32)';ctx.lineWidth=1;ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#0F1115';ctx.fill();
+    ctx.beginPath();ctx.arc(cx+Math.cos(ang)*len,cy+Math.sin(ang)*len,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(194,162,77,0.62)';ctx.fill();
+    ctx.fillStyle='rgba(15,17,21,0.16)';ctx.font="500 7.5px 'Courier New',monospace";
+    ctx.textAlign='left';ctx.fillText('PKT: 30°00N 71°32E',14,H-14);
+    ctx.textAlign='right';ctx.fillText('EUR: 50°51N 4°21E',W-14,H-14);
+    t+=0.013; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// REVEAL
+const revObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:0.07});
+document.querySelectorAll('.r').forEach(el=>revObs.observe(el));
+
+// COUNTERS
+document.querySelectorAll('.cnt').forEach(el=>{
+  const to=+el.dataset.to;
+  const obs=new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting)return;
+    obs.disconnect();
+    const t0=performance.now();
+    (function tick(ts){
+      const p=Math.min((ts-t0)/1600,1),e=1-Math.pow(1-p,3);
+      el.textContent=Math.floor(e*to);
+      if(p<1)requestAnimationFrame(tick); else el.textContent=to;
+    })(t0);
+  },{threshold:.6});
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
