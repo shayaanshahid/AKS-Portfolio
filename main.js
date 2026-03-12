@@ -60,7 +60,7 @@ cursorGlow.style.top = '0';
 cursorGlow.style.willChange = 'transform';
 
 // Cursor hover states
-const hoverTargets = document.querySelectorAll('a, button, .service-card, .portfolio-card, .stack-tag, .approach-step, .testimonial-btn, .social-link, select');
+const hoverTargets = document.querySelectorAll('a, button, .service-card, .portfolio-card, .stack-tag, .approach-step, .testimonial-btn, .social-link, .featured-project-card, select');
 hoverTargets.forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'), { passive: true });
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'), { passive: true });
@@ -259,7 +259,7 @@ function createVisibilityTracker(element) {
                 const distSq = dx * dx + dy * dy;
                 if (distSq < connectionDistSq) {
                     const alpha = (1 - Math.sqrt(distSq) / connectionDist) * 0.08;
-                    ctx.strokeStyle = `rgba(0,240,255,${alpha})`;
+                    ctx.strokeStyle = `rgba(0,153,170,${alpha})`;
                     ctx.beginPath();
                     ctx.moveTo(pi.x, pi.y);
                     ctx.lineTo(pj.x, pj.y);
@@ -281,14 +281,14 @@ function createVisibilityTracker(element) {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius * pulse, 0, Math.PI * 2);
             ctx.fillStyle = i % 5 === 0
-                ? `rgba(194,162,77,${p.alpha * pulse})`
-                : `rgba(0,240,255,${p.alpha * pulse})`;
+                ? `rgba(176,141,58,${p.alpha * pulse * 1.5})`
+                : `rgba(0,153,170,${p.alpha * pulse * 1.5})`;
             ctx.fill();
         }
 
         // Central glow (reuse gradient only on resize)
         const gradient = ctx.createRadialGradient(W * 0.3, H * 0.5, 0, W * 0.3, H * 0.5, W * 0.4);
-        gradient.addColorStop(0, 'rgba(0,240,255,0.015)');
+        gradient.addColorStop(0, 'rgba(0,153,170,0.03)');
         gradient.addColorStop(1, 'transparent');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, W, H);
@@ -322,7 +322,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        ctx.fillStyle = `rgb(${Math.floor(r * 0.08)},${Math.floor(g * 0.08)},${Math.floor(b * 0.08)})`;
+        ctx.fillStyle = `rgb(${230 + Math.floor(r * 0.05)},${230 + Math.floor(g * 0.05)},${232 + Math.floor(b * 0.04)})`;
         ctx.fillRect(0, 0, W, H);
 
         // Grid
@@ -396,11 +396,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        ctx.fillStyle = '#0c0c14';
+        ctx.fillStyle = '#e6e6eb';
         ctx.fillRect(0, 0, W, H);
 
         // Grid (wider spacing = fewer draws)
-        ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.04)';
         ctx.lineWidth = 0.5;
         for (let x = 0; x < W; x += 32) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
@@ -414,7 +414,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         // Edges
         ctx.setLineDash([4, 6]);
         ctx.lineDashOffset = -time * 12;
-        ctx.strokeStyle = 'rgba(0,240,255,0.1)';
+        ctx.strokeStyle = 'rgba(0,153,170,0.15)';
         ctx.lineWidth = 1;
         edges.forEach(([a, b]) => {
             const pa = abs(nodes[a]), pb = abs(nodes[b]);
@@ -432,7 +432,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             const t = (time * 0.3 + i * 0.15) % 1;
             ctx.beginPath();
             ctx.arc(pa.x + (pb.x - pa.x) * t, pa.y + (pb.y - pa.y) * t, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(0,240,255,${0.5 + Math.sin(time + i) * 0.2})`;
+            ctx.fillStyle = `rgba(0,153,170,${0.6 + Math.sin(time + i) * 0.2})`;
             ctx.fill();
         });
 
@@ -441,28 +441,28 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             const { x, y } = abs(n);
             const w = 100, h = 28;
 
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillStyle = 'rgba(0,0,0,0.04)';
             ctx.beginPath();
             ctx.roundRect(x - w / 2 + 2, y - h / 2 + 2, w, h, 4);
             ctx.fill();
 
-            ctx.fillStyle = '#10101a';
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.roundRect(x - w / 2, y - h / 2, w, h, 4);
             ctx.fill();
 
-            ctx.strokeStyle = `rgba(0,240,255,${0.15 + Math.sin(time + i) * 0.05})`;
+            ctx.strokeStyle = `rgba(0,153,170,${0.25 + Math.sin(time + i) * 0.08})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.roundRect(x - w / 2, y - h / 2, w, h, 4);
             ctx.stroke();
 
-            ctx.fillStyle = `rgba(0,240,255,${0.4 + Math.sin(time + i) * 0.15})`;
+            ctx.fillStyle = `rgba(0,153,170,${0.5 + Math.sin(time + i) * 0.15})`;
             ctx.beginPath();
             ctx.roundRect(x - w / 2, y - h / 2, 3, h, [4, 0, 0, 4]);
             ctx.fill();
 
-            ctx.fillStyle = '#8a8a9a';
+            ctx.fillStyle = '#5a5a72';
             ctx.font = "500 9px 'Inter', sans-serif";
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
@@ -498,11 +498,11 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        ctx.fillStyle = '#0c0c14';
+        ctx.fillStyle = '#e6e6eb';
         ctx.fillRect(0, 0, W, H);
 
         // Grid (wider spacing)
-        ctx.strokeStyle = 'rgba(255,255,255,0.02)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.04)';
         ctx.lineWidth = 0.5;
         for (let x = 0; x < W; x += 40) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
@@ -518,7 +518,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(time * 0.1 * (i % 2 === 0 ? 1 : -1));
-            ctx.strokeStyle = `rgba(0,240,255,${0.06 - i * 0.012})`;
+            ctx.strokeStyle = `rgba(0,153,170,${0.1 - i * 0.015})`;
             ctx.lineWidth = 0.8;
             ctx.strokeRect(-r, -r, r * 2, r * 2);
             ctx.restore();
@@ -530,29 +530,29 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
-        ctx.strokeStyle = 'rgba(0,240,255,0.25)';
+        ctx.strokeStyle = 'rgba(0,153,170,0.35)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#00f0ff';
+        ctx.fillStyle = '#0099aa';
         ctx.fill();
 
         ctx.beginPath();
         ctx.arc(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(194,162,77,0.7)';
+        ctx.fillStyle = 'rgba(176,141,58,0.7)';
         ctx.fill();
 
         [60, 100].forEach((r, i) => {
             ctx.beginPath();
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(0,240,255,${0.04 + i * 0.01})`;
+            ctx.strokeStyle = `rgba(0,153,170,${0.06 + i * 0.02})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
         });
 
-        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.font = "500 8px 'JetBrains Mono', monospace";
         ctx.textAlign = 'left';
         ctx.fillText('PKT: 30°00N 71°32E', 16, H - 16);
@@ -564,34 +564,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     draw();
 })();
 
-// ─── TESTIMONIALS CAROUSEL ───
-(() => {
-    const track = document.getElementById('testimonial-track');
-    const prevBtn = document.getElementById('testimonial-prev');
-    const nextBtn = document.getElementById('testimonial-next');
-    const dots = document.querySelectorAll('.testimonial-dot');
-    let current = 0;
-    const total = dots.length;
-
-    function goto(index) {
-        current = ((index % total) + total) % total;
-        track.style.transform = `translateX(-${current * 100}%)`;
-        dots.forEach((d, i) => d.classList.toggle('active', i === current));
-    }
-
-    prevBtn.addEventListener('click', () => goto(current - 1));
-    nextBtn.addEventListener('click', () => goto(current + 1));
-    dots.forEach((dot, i) => dot.addEventListener('click', () => goto(i)));
-
-    let autoPlay = setInterval(() => goto(current + 1), 5000);
-
-    [prevBtn, nextBtn, track].forEach(el => {
-        el.addEventListener('mouseenter', () => clearInterval(autoPlay));
-        el.addEventListener('mouseleave', () => {
-            autoPlay = setInterval(() => goto(current + 1), 5000);
-        });
-    });
-})();
+// ─── (Testimonials carousel removed — replaced with Featured Projects) ───
 
 // ─── CONTACT FORM ───
 (() => {
