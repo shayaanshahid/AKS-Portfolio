@@ -1350,8 +1350,8 @@ body.cursor-hover #cursor-glow {
 /* ─── ABOUT ─── */
 .about-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 60px;
   align-items: center;
 }
 
@@ -1389,7 +1389,7 @@ body.cursor-hover #cursor-glow {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  aspect-ratio: 5/4;
+  aspect-ratio: 4/3;
   overflow: hidden;
 }
 
@@ -1600,6 +1600,7 @@ body.cursor-hover #cursor-glow {
   outline: none;
   transition: border-color 0.3s, box-shadow 0.3s;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .form-input:focus,

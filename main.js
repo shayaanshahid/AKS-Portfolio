@@ -474,7 +474,7 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     draw();
 })();
 
-// ─── ABOUT CANVAS (pause when off-screen) ───
+// ─── ABOUT CANVAS (INTERACTIVE THEMATIC MAP) ───
 (() => {
     const canvas = document.getElementById('about-canvas');
     if (!canvas) return;
@@ -482,84 +482,133 @@ document.querySelectorAll('.portfolio-canvas').forEach(canvas => {
     const ctx = canvas.getContext('2d');
 
     function resize() {
-        canvas.width = parent.offsetWidth;
-        canvas.height = parent.offsetHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = parent.offsetWidth * dpr;
+        canvas.height = parent.offsetHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
     new ResizeObserver(throttle(resize, 200)).observe(parent);
 
     const isVisible = createVisibilityTracker(canvas);
 
+    let d3, worldMap;
+    (async () => {
+        try {
+            d3 = await import('https://cdn.jsdelivr.net/npm/d3@7/+esm');
+            const response = await fetch('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson');
+            worldMap = await response.json();
+        } catch (err) {
+            console.error("Map failed to load.", err);
+        }
+    })();
+
+    const locations = [
+        { name: 'Belgium', coords: [4.4699, 50.5039] },
+        { name: 'Pakistan', coords: [69.3451, 30.3753] }
+    ];
+
+    // Highlight precise countries by their standard GeoJSON name
+    const activeCountries = ['Belgium', 'Pakistan']; 
+
     let time = 0;
+    
+    // Draw a classic teardrop map pin with white hole
+    function drawPin(ctx, x, y, scale = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        
+        ctx.shadowColor = 'rgba(64,224,208,0.4)';
+        ctx.shadowBlur = 8;
+        
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(8, -12, 12, -18, 12, -24);
+        ctx.arc(0, -24, 12, 0, Math.PI, true);
+        ctx.bezierCurveTo(-12, -18, -8, -12, 0, 0);
+        ctx.fillStyle = '#40e0d0'; // Turquoise/Cyan
+        ctx.fill();
+        
+        ctx.shadowBlur = 0;
+        ctx.beginPath();
+        ctx.arc(0, -24, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        
+        ctx.restore();
+    }
+
     function draw() {
+        if (!worldMap || !d3) {
+            requestAnimationFrame(draw);
+            return;
+        }
         requestAnimationFrame(draw);
         if (!isVisible()) return;
 
-        const W = canvas.width, H = canvas.height;
+        const W = parent.offsetWidth;
+        const H = parent.offsetHeight;
         ctx.clearRect(0, 0, W, H);
 
-        ctx.fillStyle = '#e6e6eb';
+        // White background
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, W, H);
 
-        // Grid (wider spacing)
-        ctx.strokeStyle = 'rgba(0,0,0,0.04)';
-        ctx.lineWidth = 0.5;
-        for (let x = 0; x < W; x += 40) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-        }
-        for (let y = 0; y < H; y += 40) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-        }
+        // Top-left text
+        ctx.fillStyle = '#52545d';
+        ctx.font = "600 16px 'Inter', sans-serif";
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText('World Domination 6%', 20, 20);
 
-        const cx = W / 2, cy = H / 2;
+        // D3 Projection
+        let scale = W * 0.16; // Adjust strictly to fit full world
+        if (W < 500) scale = W * 0.25;
+        
+        const projection = d3.geoMercator()
+            .scale(scale)
+            .translate([W / 2, H * 0.65]); // Push down slightly
 
-        // Rotating squares
-        [70, 110, 160, 210].forEach((r, i) => {
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(time * 0.1 * (i % 2 === 0 ? 1 : -1));
-            ctx.strokeStyle = `rgba(0,153,170,${0.1 - i * 0.015})`;
-            ctx.lineWidth = 0.8;
-            ctx.strokeRect(-r, -r, r * 2, r * 2);
-            ctx.restore();
-        });
+        const pathGenerator = d3.geoPath().projection(projection).context(ctx);
 
-        // Radar line
-        const ang = time * 0.4;
-        const len = 120;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
-        ctx.strokeStyle = 'rgba(0,153,170,0.35)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-        ctx.fillStyle = '#0099aa';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(176,141,58,0.7)';
-        ctx.fill();
-
-        [60, 100].forEach((r, i) => {
+        // Draw Map Landmasses
+        worldMap.features.forEach(feature => {
             ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(0,153,170,${0.06 + i * 0.02})`;
+            pathGenerator(feature);
+            
+            if (activeCountries.includes(feature.properties.name)) {
+                ctx.fillStyle = '#52545d'; // Dark charcoal
+            } else {
+                ctx.fillStyle = '#e5e7e9'; // Light gray
+            }
+            
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 0.5;
             ctx.stroke();
         });
 
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.font = "500 8px 'JetBrains Mono', monospace";
-        ctx.textAlign = 'left';
-        ctx.fillText('PKT: 30°00N 71°32E', 16, H - 16);
-        ctx.textAlign = 'right';
-        ctx.fillText('EUR: 50°51N 4°21E', W - 16, H - 16);
+        // Draw Client Pins
+        locations.forEach((loc, i) => {
+            const [x, y] = projection(loc.coords);
+            
+            // Cyan ripple
+            const pulse = (time * 1.5 + i * Math.PI) % 2; 
+            const radius = 5 + pulse * 12;
+            const alpha = Math.max(0, 1 - pulse * 0.5);
 
-        time += 0.013;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(64,224,208,${alpha * 0.4})`;
+            ctx.fill();
+
+            // Bobbing pin
+            const bob = Math.sin(time * 3 + i) * 3;
+            drawPin(ctx, x, y + bob, 0.7);
+        });
+
+        time += 0.015;
     }
     draw();
 })();
